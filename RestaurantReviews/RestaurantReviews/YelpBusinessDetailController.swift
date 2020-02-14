@@ -15,15 +15,7 @@ class YelpBusinessDetailController: UITableViewController {
     @IBOutlet weak var ratingsCountLabel: UILabel!
     @IBOutlet weak var categoriesLabel: UILabel!
     @IBOutlet weak var hoursLabel: UILabel!
-    @IBOutlet weak var currentHoursStatusLabel: UILabel! {
-        didSet {
-            if currentHoursStatusLabel.text == "Open" {
-                currentHoursStatusLabel.textColor = UIColor(red: 2/255.0, green: 192/255.0, blue: 97/255.0, alpha: 1.0)
-            } else {
-                currentHoursStatusLabel.textColor = UIColor(red: 209/255.0, green: 47/255.0, blue: 27/255.0, alpha: 1.0)
-            }
-        }
-    }
+    @IBOutlet weak var currentHoursStatusLabel: UILabel!
     
     var business: YelpBusiness?
     
@@ -41,7 +33,6 @@ class YelpBusinessDetailController: UITableViewController {
         }
     }
     
-    
     /// Configures the views in the table view's header view
     ///
     /// - Parameter viewModel: View model representation of a YelpBusiness object
@@ -52,6 +43,12 @@ class YelpBusinessDetailController: UITableViewController {
         categoriesLabel.text = viewModel.categories
         hoursLabel.text = viewModel.hours
         currentHoursStatusLabel.text = viewModel.currentStatus
+        
+        if currentHoursStatusLabel.text == "Open" {
+            currentHoursStatusLabel.textColor = UIColor(red: 2/255.0, green: 192/255.0, blue: 97/255.0, alpha: 1.0)
+        } else {
+            currentHoursStatusLabel.textColor = UIColor(red: 209/255.0, green: 47/255.0, blue: 27/255.0, alpha: 1.0)
+        }
     }
 
     // MARK: - Table View

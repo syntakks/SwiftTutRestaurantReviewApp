@@ -21,12 +21,14 @@ class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
     
     let dataSource = YelpSearchResultsDataSource()
     
-    lazy var locationManager: LocationManager = {
-        return LocationManager(delegate: self, permissionsDelegate: nil)
+    lazy var client: YelpClient = {
+          return YelpClient()
     }()
     
-    lazy var client: YelpClient = {
-       return YelpClient()
+    let queue = OperationQueue()
+    
+    lazy var locationManager: LocationManager = {
+        return LocationManager(delegate: self, permissionsDelegate: nil)
     }()
     
     var coordinate: Coordinate? {
@@ -46,16 +48,16 @@ class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
             locationManager.requestLocation()
         }
     }
-
+// MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("viewDidLoad")
         setupSearchBar()
         setupTableView()
+        
+        addObserver(self, forKeyPath: #keyPath(YelpBusinessDetailsOperation.isFinished), options: [.new, .old], context: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        print("viewDidAppear")
         if isAuthorized {
             // Trying to prevent multiple location calls.
             guard let _ = coordinate else {
@@ -65,10 +67,6 @@ class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
         } else {
             checkPermissions()
         }
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        print("viewDidDisappear")
     }
     
     // MARK: - Table View
@@ -113,7 +111,16 @@ class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
 // MARK: - UITableViewDelegate
 extension YelpSearchController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "showBusiness", sender: nil)
+        let business = dataSource.object(at: indexPath)
+        // Use the operation to update the business object before performing the segue to the business details.
+        let operation = YelpBusinessDetailsOperation(business: business, client: self.client)
+        operation.completionBlock = {
+            DispatchQueue.main.async {
+                self.dataSource.update(business, at: indexPath)
+                self.performSegue(withIdentifier: "showBusiness", sender: nil)
+            }
+        }
+        queue.addOperation(operation)
     }
 }
 
@@ -143,7 +150,12 @@ extension YelpSearchController: UISearchResultsUpdating {
 extension YelpSearchController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showBusiness" {
-            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let business = dataSource.object(at: indexPath)
+                
+                let detailController = segue.destination as! YelpBusinessDetailController
+                detailController.business = business
+            }
         }
     }
 }
@@ -160,3 +172,12 @@ extension YelpSearchController: LocationManagerDelegate {
     }
 }
 
+// MARK: - KVO - Key Value Observer
+extension YelpSearchController {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        print("keyPath: \(String(describing: keyPath))")
+        print("object: \(String(describing: object))")
+        print("change: \(String(describing: change))")
+        print("context: \(String(describing: context))")
+    }
+}

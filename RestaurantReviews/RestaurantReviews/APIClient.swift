@@ -87,8 +87,6 @@ extension APIClient {
                     return
                 }
                 
-                print(json)
-                
                 if let value = parse(json) {
                     completion(Result.success(value))
                 } else {

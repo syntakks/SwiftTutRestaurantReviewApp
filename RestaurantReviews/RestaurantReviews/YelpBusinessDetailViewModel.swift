@@ -29,20 +29,31 @@ extension YelpBusinessDetailViewModel {
         
         guard let hours = business.hours else { return nil }
         
-        for day in hours.schedule {
-            print(day.day)
+//        for day in hours.schedule {
+//            print(day.day)
+//        }
+        
+        let currentDayValue = Date.stupidlyIndexedCurrentDate
+        
+        let today = hours.schedule.first {
+            return $0.day.rawValue == currentDayValue
         }
         
-        let currentDayValue = Date.currentDay
-        print("Current Day: \(currentDayValue)")
-        let today = hours.schedule.filter({ $0.day.rawValue == Date.currentDay }).first!
+        print(today?.start)
         
-        let startString = DateFormatter.stringFromDateString(today.start, withInputDateFormat: "HHmm")
-        let endString = DateFormatter.stringFromDateString(today.end, withInputDateFormat: "HHmm")
+        let startString: String
+        let endString: String
         
+        if let today = today {
+            startString = DateFormatter.stringFromDateString(today.start, withInputDateFormat: "HHmm")
+            endString = DateFormatter.stringFromDateString(today.end, withInputDateFormat: "HHmm")
+        } else {
+            startString = "--"
+            endString = "--"
+        }
         
         self.hours = "Hours Today: \(startString) - \(endString)"
-        self.currentStatus = business.isClosed ? "Closed" : "Open"
+        self.currentStatus = hours.isOpenNow ? "Open" : "Closed"
     }
 }
 
@@ -64,13 +75,23 @@ extension DateFormatter {
 }
 
 extension Date {
-    static var currentDay: Int {
+    static var stupidlyIndexedCurrentDate: Int {
         let date = Date()
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: date)
+        let day = calendar.component(.weekday, from: date)
         
-        let day = components.day! % 7
+        let bullshitDayValue: Int
         
-        return day
+        switch day {
+        case 1: bullshitDayValue = 7
+        case 2: bullshitDayValue = 0
+        case 3: bullshitDayValue = 1
+        case 4: bullshitDayValue = 2
+        case 5: bullshitDayValue = 3
+        case 6: bullshitDayValue = 4
+        case 7: bullshitDayValue = 5
+        default: bullshitDayValue = 0
+        }
+        return bullshitDayValue
     }
 }

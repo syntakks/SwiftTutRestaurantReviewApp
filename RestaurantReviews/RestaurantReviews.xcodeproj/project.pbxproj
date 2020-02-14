@@ -34,6 +34,7 @@
 		E5238EC423F6504B000D7A17 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5238EC323F6504B000D7A17 /* APIClient.swift */; };
 		E5238EC623F65222000D7A17 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5238EC523F65222000D7A17 /* Result.swift */; };
 		E5238EC823F65682000D7A17 /* YelpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5238EC723F65682000D7A17 /* YelpClient.swift */; };
+		E5238ECE23F6F0CA000D7A17 /* YelpBusinessDetailsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5238ECD23F6F0CA000D7A17 /* YelpBusinessDetailsOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +67,7 @@
 		E5238EC323F6504B000D7A17 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		E5238EC523F65222000D7A17 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		E5238EC723F65682000D7A17 /* YelpClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YelpClient.swift; sourceTree = "<group>"; };
+		E5238ECD23F6F0CA000D7A17 /* YelpBusinessDetailsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YelpBusinessDetailsOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +138,7 @@
 				E5238EC323F6504B000D7A17 /* APIClient.swift */,
 				E5238EC523F65222000D7A17 /* Result.swift */,
 				E5238EC723F65682000D7A17 /* YelpClient.swift */,
+				E5238ECD23F6F0CA000D7A17 /* YelpBusinessDetailsOperation.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 				E5238EBE23F5FAC0000D7A17 /* LocationManager.swift in Sources */,
 				97D629DA1EC23110007BE0CE /* AppDelegate.swift in Sources */,
 				97D62A151EC239D6007BE0CE /* ReviewCell.swift in Sources */,
+				E5238ECE23F6F0CA000D7A17 /* YelpBusinessDetailsOperation.swift in Sources */,
 				97D629F01EC231C4007BE0CE /* YelpBusiness.swift in Sources */,
 				97D62A061EC233D8007BE0CE /* PermissionsController.swift in Sources */,
 				97D629FF1EC2332D007BE0CE /* Address.swift in Sources */,

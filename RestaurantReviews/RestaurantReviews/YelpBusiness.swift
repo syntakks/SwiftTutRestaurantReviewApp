@@ -12,7 +12,7 @@ class YelpBusiness: NSObject, JSONDecodable {
     let id: String
     let name: String
     let imageUrl: String
-    let isClosed: Bool
+    var isClosed: Bool
     let url: String
     let reviewCount: Int
     let categories: [YelpCategory]
@@ -79,6 +79,9 @@ class YelpBusiness: NSObject, JSONDecodable {
     }
     
     func updateWithHoursAndPhotos(json: [String: Any]) {
+        print("UPDATED JSON===========================================")
+        print(json)
+        
         if let photoStrings = json["photos"] as? [String] {
             photos = photoStrings
         }
