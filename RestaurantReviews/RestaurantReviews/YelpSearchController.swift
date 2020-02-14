@@ -8,30 +8,67 @@
 
 import UIKit
 
-class YelpSearchController: UIViewController {
+/// This will pass back a success status from the initial Permission Controller. Then it kicks off the initial location fix and coordinate and automatic nearby search.
+protocol YelpSearchControllerDelegate {
+    func updateAuthorizationStatus()
+}
+
+class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
     
     // MARK: - Properties
-    
     let searchController = UISearchController(searchResultsController: nil)
     @IBOutlet weak var tableView: UITableView!
     
     let dataSource = YelpSearchResultsDataSource()
     
+    lazy var locationManager: LocationManager = {
+        return LocationManager(delegate: self, permissionsDelegate: nil)
+    }()
+    
+    lazy var client: YelpClient = {
+       return YelpClient()
+    }()
+    
+    var coordinate: Coordinate? {
+        didSet {
+            if let coordinate = coordinate {
+                showNearbyRestaurants(at: coordinate)
+            }
+        }
+    }
+    
     var isAuthorized: Bool {
-        return false
+        return LocationManager.isAuthorized
+    }
+    
+    func updateAuthorizationStatus() {
+        if LocationManager.isAuthorized {
+            locationManager.requestLocation()
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("viewDidLoad")
         setupSearchBar()
         setupTableView()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if !isAuthorized {
+        print("viewDidAppear")
+        if isAuthorized {
+            // Trying to prevent multiple location calls.
+            guard let _ = coordinate else {
+                locationManager.requestLocation()
+                return
+            }
+        } else {
             checkPermissions()
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        print("viewDidDisappear")
     }
     
     // MARK: - Table View
@@ -40,6 +77,17 @@ class YelpSearchController: UIViewController {
         self.tableView.delegate = self
     }
     
+    func showNearbyRestaurants(at coordinate: Coordinate) {
+        client.search(withTerm: "", at: coordinate) { [weak self] result in
+            switch result {
+            case .success(let businesses):
+                self?.dataSource.update(with: businesses)
+                self?.tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
     // MARK: - Search
     
@@ -56,25 +104,38 @@ class YelpSearchController: UIViewController {
     /// Checks (1) if the user is authenticated against the Yelp API and has an OAuth
     /// token and (2) if the user has authorized location access for whenInUse tracking.
     func checkPermissions() {
-        let isAuthorizedForLocation = false
-        let isAuthenticatedWithToken = false
-        
-        let permissionsController = PermissionsController(isAuthorizedForLocation: isAuthorizedForLocation, isAuthenticatedWithToken: isAuthenticatedWithToken)
+        let isAuthorizedForLocation = LocationManager.isAuthorized
+        let permissionsController = PermissionsController(isAuthorizedForLocation: isAuthorizedForLocation, delegate: self)
         present(permissionsController, animated: true, completion: nil)
     }
 }
 
 // MARK: - UITableViewDelegate
 extension YelpSearchController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "showBusiness", sender: nil)
+    }
 }
 
 // MARK: - Search Results
 extension YelpSearchController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let searchTerm = searchController.searchBar.text else { return }
-        
+        guard let searchTerm = searchController.searchBar.text,
+        let coordinate = coordinate else { return }
         print("Search text: \(searchTerm)")
+        
+        if !searchTerm.isEmpty {
+            client.search(withTerm: searchTerm, at: coordinate) { [weak self] result in
+                switch result {
+                case .success(let businesses):
+                    self?.dataSource.update(with: businesses)
+                    self?.tableView.reloadData()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
+        
     }
 }
 
@@ -84,6 +145,18 @@ extension YelpSearchController {
         if segue.identifier == "showBusiness" {
             
         }
+    }
+}
+
+// MARK: - Location Manager Delegate
+extension YelpSearchController: LocationManagerDelegate {
+    func obtainedCoordinates(_ coordinate: Coordinate) {
+        self.coordinate = coordinate
+        print(coordinate)
+    }
+    
+    func failedWithError(_ error: LocationError) {
+        print("Yelp Search Controller: \(error.localizedDescription)")
     }
 }
 

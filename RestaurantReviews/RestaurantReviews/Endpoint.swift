@@ -34,7 +34,14 @@ extension Endpoint {
     /// URL is obtained through the `urlComponents` object.
     var request: URLRequest {
         let url = urlComponents.url!
-        return URLRequest(url: url)
+        var request = URLRequest(url: url)
+        let bearerString = "Bearer \(apiToken)"
+        request.addValue(bearerString, forHTTPHeaderField: "Authorization")
+        return request
+    }
+    
+    var apiToken: String {
+        return "bXUTEMsisPI09wCGVG0-0Bi-JqWlQE0slXo80mPZAN-_6hn3ywAiyp61_A_4V2h9GIU_ugjpoIkbXfNDI77K-EljmbvgfftFyFf18_izWn_lgQ_Abnnj4qLA5a9FXnYx"
     }
 }
 

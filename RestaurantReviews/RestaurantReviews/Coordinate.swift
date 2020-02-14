@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 struct Coordinate {
     let latitude: Double
@@ -18,5 +19,12 @@ extension Coordinate: JSONDecodable {
         guard let latitudeValue = json["latitude"] as? Double, let longitudeValue = json["longitude"] as? Double else { return nil }
         self.latitude = latitudeValue
         self.longitude = longitudeValue
+    }
+}
+
+extension Coordinate {
+    init(location: CLLocation) {
+        self.latitude = location.coordinate.latitude
+        self.longitude = location.coordinate.longitude
     }
 }
