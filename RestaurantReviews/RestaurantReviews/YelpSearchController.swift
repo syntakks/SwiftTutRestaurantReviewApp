@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 /// This will pass back a success status from the initial Permission Controller. Then it kicks off the initial location fix and coordinate and automatic nearby search.
 protocol YelpSearchControllerDelegate {
@@ -16,6 +17,9 @@ protocol YelpSearchControllerDelegate {
 class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
     
     // MARK: - Properties
+    
+    @IBOutlet weak var mapView: MKMapView!
+    
     let searchController = UISearchController(searchResultsController: nil)
     @IBOutlet weak var tableView: UITableView!
     
@@ -81,6 +85,7 @@ class YelpSearchController: UIViewController, YelpSearchControllerDelegate {
             case .success(let businesses):
                 self?.dataSource.update(with: businesses)
                 self?.tableView.reloadData()
+                self?.mapView.addAnnotations(businesses)
             case .failure(let error):
                 print(error)
             }
@@ -113,14 +118,18 @@ extension YelpSearchController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let business = dataSource.object(at: indexPath)
         // Use the operation to update the business object before performing the segue to the business details.
-        let operation = YelpBusinessDetailsOperation(business: business, client: self.client)
-        operation.completionBlock = {
+        let detailsOperation = YelpBusinessDetailsOperation(business: business, client: self.client)
+        let reviewsOperation = YelpBusinessReviewsOperation(business: business, client: self.client)
+        reviewsOperation.addDependency(detailsOperation) // This makes sure the details operation runs successfully first.
+        // Before trying to run the reviews opertaion.
+        reviewsOperation.completionBlock = {
             DispatchQueue.main.async {
                 self.dataSource.update(business, at: indexPath)
                 self.performSegue(withIdentifier: "showBusiness", sender: nil)
             }
         }
-        queue.addOperation(operation)
+        queue.addOperation(detailsOperation)
+        queue.addOperation(reviewsOperation)
     }
 }
 
@@ -137,6 +146,8 @@ extension YelpSearchController: UISearchResultsUpdating {
                 case .success(let businesses):
                     self?.dataSource.update(with: businesses)
                     self?.tableView.reloadData()
+                    self?.mapView.removeAnnotations(self?.mapView.annotations ?? [])
+                    self?.mapView.addAnnotations(businesses)
                 case .failure(let error):
                     print(error)
                 }
@@ -155,6 +166,7 @@ extension YelpSearchController {
                 
                 let detailController = segue.destination as! YelpBusinessDetailController
                 detailController.business = business
+                detailController.dataSource.updateData(business.reviews)
             }
         }
     }
@@ -164,6 +176,7 @@ extension YelpSearchController {
 extension YelpSearchController: LocationManagerDelegate {
     func obtainedCoordinates(_ coordinate: Coordinate) {
         self.coordinate = coordinate
+        adjustMap(with: coordinate)
         print(coordinate)
     }
     
@@ -179,5 +192,16 @@ extension YelpSearchController {
         print("object: \(String(describing: object))")
         print("change: \(String(describing: change))")
         print("context: \(String(describing: context))")
+    }
+}
+
+// MARK: - Map Kit Extension
+extension YelpSearchController {
+    func adjustMap(with coordinate: Coordinate) {
+        let coordinate2d = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let region = MKCoordinateRegion.init(center: coordinate2d, latitudinalMeters: 2500, longitudinalMeters: 2500)
+        mapView.setRegion(region, animated: true)
+        
+        
     }
 }

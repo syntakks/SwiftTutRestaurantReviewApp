@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MapKit
 
 class YelpBusiness: NSObject, JSONDecodable {
     let id: String
@@ -89,5 +90,19 @@ class YelpBusiness: NSObject, JSONDecodable {
         if let hours = json["hours"] as? [[String: Any]], let dict = hours.first {
             self.hours = BusinessHours(json: dict)
         }
+    }
+}
+
+extension YelpBusiness: MKAnnotation {
+    var coordinate: CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+    }
+    
+    var title: String? {
+        return self.name
+    }
+    
+    var subtitle: String? {
+        return isClosed ? "Closed" : "Open"
     }
 }

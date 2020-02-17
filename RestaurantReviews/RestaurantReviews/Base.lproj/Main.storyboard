@@ -21,9 +21,18 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MoP-bm-B2j">
                                 <rect key="frame" x="0.0" y="44" width="375" height="200"/>
+                                <subviews>
+                                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" showsPointsOfInterest="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Lk-eo-0DP">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                                    </mapView>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
+                                    <constraint firstItem="2Lk-eo-0DP" firstAttribute="leading" secondItem="MoP-bm-B2j" secondAttribute="leading" id="9RM-ro-6Pm"/>
                                     <constraint firstAttribute="height" constant="200" id="Dcl-W2-3EX"/>
+                                    <constraint firstAttribute="trailing" secondItem="2Lk-eo-0DP" secondAttribute="trailing" id="Dkl-Xn-DGV"/>
+                                    <constraint firstItem="2Lk-eo-0DP" firstAttribute="top" secondItem="MoP-bm-B2j" secondAttribute="top" id="gz9-S3-tsh"/>
+                                    <constraint firstAttribute="bottom" secondItem="2Lk-eo-0DP" secondAttribute="bottom" id="sXu-dw-tuq"/>
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="6RN-QN-ScV">
@@ -54,6 +63,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="QBS-Qd-y7q"/>
                     <connections>
+                        <outlet property="mapView" destination="2Lk-eo-0DP" id="kgH-df-u0R"/>
                         <outlet property="tableView" destination="6RN-QN-ScV" id="6Rd-n8-NsV"/>
                         <segue destination="lYs-e0-iaA" kind="show" identifier="showBusiness" id="vbb-yy-G8t"/>
                     </connections>
@@ -165,7 +175,7 @@
                                                 <constraint firstAttribute="height" constant="60" id="jca-Dn-XT1"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JyG-1E-vnL">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JyG-1E-vnL">
                                             <rect key="frame" x="84" y="19" width="267" height="54"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <nil key="textColor"/>
